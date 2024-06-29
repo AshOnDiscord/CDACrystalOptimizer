@@ -50,6 +50,7 @@ public class ClientConnectionMixin {
                         if (!(weakness == null || strength != null && strength.getAmplifier() > weakness.getAmplifier() || ClientConnectionMixin.this.isTool(mc.player.getMainHandItem()))) {
                             return;
                         }
+                        System.out.println("Crystal Broken");
                         entity.kill();
                         entity.setRemoved(Entity.RemovalReason.KILLED);
                         entity.onClientRemoval();
