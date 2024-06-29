@@ -24,7 +24,7 @@
     "crystaloptimizer-common.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.12",
-    "minecraft": "1.19.x"
+    "fabricloader": ">=0.15.9",
+    "minecraft": ">=1.20"
   }
 }

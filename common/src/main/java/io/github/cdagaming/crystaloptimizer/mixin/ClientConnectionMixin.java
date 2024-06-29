@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Collection;
+
 @Mixin(Connection.class)
 public class ClientConnectionMixin {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"))
@@ -45,8 +47,18 @@ public class ClientConnectionMixin {
                         return;
                     }
                     if (hitResult.getType() == HitResult.Type.ENTITY && (entity = (entityHitResult = (EntityHitResult) hitResult).getEntity()) instanceof EndCrystal) {
-                        MobEffectInstance weakness = mc.player.getEffect(MobEffects.WEAKNESS);
-                        MobEffectInstance strength = mc.player.getEffect(MobEffects.DAMAGE_BOOST);
+//                        MobEffectInstance weakness = mc.player.getEffect(MobEffects.WEAKNESS);
+//                        MobEffectInstance strength = mc.player.getEffect(MobEffects.DAMAGE_BOOST);
+                        Collection<MobEffectInstance> effects = mc.player.getActiveEffects();
+                        MobEffectInstance weakness = null;
+                        MobEffectInstance strength = null;
+                        for (MobEffectInstance effect : effects) {
+                            if (effect.getEffect() == MobEffects.WEAKNESS) {
+                                weakness = effect;
+                            } else if (effect.getEffect() == MobEffects.DAMAGE_BOOST) {
+                                strength = effect;
+                            }
+                        }
                         if (!(weakness == null || strength != null && strength.getAmplifier() > weakness.getAmplifier() || ClientConnectionMixin.this.isTool(mc.player.getMainHandItem()))) {
                             return;
                         }
