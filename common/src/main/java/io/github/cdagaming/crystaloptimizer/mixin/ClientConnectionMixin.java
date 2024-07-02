@@ -1,5 +1,6 @@
 package io.github.cdagaming.crystaloptimizer.mixin;
 
+import io.github.cdagaming.crystaloptimizer.CrystalOptimizer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -13,6 +14,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +25,7 @@ import java.util.Collection;
 
 @Mixin(Connection.class)
 public class ClientConnectionMixin {
+    private static final Logger logger = LoggerFactory.getLogger(ClientConnectionMixin.class);
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"))
     private void onPacketSend(Packet<?> packet, CallbackInfo ci) {
         final Minecraft mc = Minecraft.getInstance();
@@ -50,15 +54,9 @@ public class ClientConnectionMixin {
 //                        MobEffectInstance weakness = mc.player.getEffect(MobEffects.WEAKNESS);
 //                        MobEffectInstance strength = mc.player.getEffect(MobEffects.DAMAGE_BOOST);
                         Collection<MobEffectInstance> effects = mc.player.getActiveEffects();
-                        MobEffectInstance weakness = null;
-                        MobEffectInstance strength = null;
-                        for (MobEffectInstance effect : effects) {
-                            if (effect.getEffect() == MobEffects.WEAKNESS) {
-                                weakness = effect;
-                            } else if (effect.getEffect() == MobEffects.DAMAGE_BOOST) {
-                                strength = effect;
-                            }
-                        }
+                        MobEffectInstance weakness = CrystalOptimizer.getEffect(effects, "weakness");
+                        MobEffectInstance strength = CrystalOptimizer.getEffect(effects, "strength");
+
                         if (!(weakness == null || strength != null && strength.getAmplifier() > weakness.getAmplifier() || ClientConnectionMixin.this.isTool(mc.player.getMainHandItem()))) {
                             return;
                         }
